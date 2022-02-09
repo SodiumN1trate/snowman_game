@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://pixijs.download/release/pixi.js"></script>
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div class="slidecontainer">
+        <span>Angle: </span>
+        <input type="range" min="1" max="80" value="40" class="slider" id="angle">
+        <span>Force: </span>
+        <input type="range" min="1" max="60" value="30" class="slider" id="force">
+        <button id="launch">Launch</button>
+    </div>
+    <script src="https://pixijs.download/v6.2.2/pixi.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
