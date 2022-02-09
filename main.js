@@ -108,12 +108,12 @@ function throw_ball(ball)
                 if(ballSpeedX > 0) {
                     ballSpeedX -= stopAcceleration / app.ticker.FPS
                     isGrounded = true
-                    leaderboard[throws] = ball.x
-                    lastScore.text = `Last score: ${Math.ceil(leaderboard[throws] / 100)}m`
+                    leaderboard[throws] = Math.ceil(ball.x/100 + 2)
+                    lastScore.text = `Last score: ${leaderboard[throws]}m`
                     document.querySelector("#launch").disabled = false
                     document.querySelector("#launch").style.backgroundColor = '#127FBE'
                     if(throws === 0) {
-                        const winnerText = new PIXI.Text(`Highscore: ${String(Math.ceil(Math.max.apply(null, leaderboard)/100))} meters`)
+                        const winnerText = new PIXI.Text(`Highscore: ${Math.max.apply(null, leaderboard)} meters`)
                         app.stage.addChild(winnerText)
                         winnerText.y =  app.view.height / 2
                         winnerText.x = app.view.width / 2 - 990
@@ -142,7 +142,7 @@ function throw_ball(ball)
             circle.beginFill(colors[throws]).drawCircle(ball.x+25, ball.y+25, 5).endFill()
             app.stage.addChild(circle)
 
-            speedText.text = `${Math.ceil(ball.x/100)}m`
+            speedText.text = `${Math.ceil(ball.x/100 +2)}m`
             speedText.x = ball.x + 50
             speedText.y = ball.y - 50
         }
