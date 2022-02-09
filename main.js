@@ -31,6 +31,10 @@ app.stage.addChild(fps)
 const speedText = new PIXI.Text('')
 app.stage.addChild(speedText)
 
+const lastScore = new PIXI.Text('')
+app.stage.addChild(lastScore)
+
+
 let throws = 3
 
 const attemptsText = new PIXI.Text(`Attempts: ${throws}`)
@@ -51,7 +55,7 @@ app.stage.addChild(ball)
 let lastTime = 0
 
 
-const colors = [0xFFFFFF, 0x58D68DF, 0x2980B9F]
+const colors = [0xFFFFFF, 0x52bf90F, 0xFFED00F]
 
 const leaderboard = [0, 0, 0]
 
@@ -104,14 +108,20 @@ function throw_ball(ball)
                 if(ballSpeedX > 0) {
                     ballSpeedX -= stopAcceleration / app.ticker.FPS
                     isGrounded = true
-                    leaderboard[throws] = Math.ceil(ball.x)
+                    leaderboard[throws] = ball.x
+                    lastScore.text = `Last score: ${Math.ceil(leaderboard[throws] / 100)}m`
+                    document.querySelector("#launch").disabled = false
+                    document.querySelector("#launch").style.backgroundColor = '#127FBE'
                     if(throws === 0) {
-                        const winnerText = new PIXI.Text(`Highscore: ${String(Math.max.apply(null, leaderboard)/100)} meters`)
+                        const winnerText = new PIXI.Text(`Highscore: ${String(Math.ceil(Math.max.apply(null, leaderboard)/100))} meters`)
                         app.stage.addChild(winnerText)
                         winnerText.y =  app.view.height / 2
-                        winnerText.x = 375 + ball.x - app.view.width / 2
+                        winnerText.x = app.view.width / 2 - 990
                         delete ball
                     }
+                        app.stage.pivot.x = app.view.width - 1870
+                        background.x = app.view.width - 1870
+                        lastScore.x = app.view.width / 2 - 990
                 }
             }
             else {
@@ -127,6 +137,7 @@ function throw_ball(ball)
             background.x = ball.x - app.view.width / 2
             fps.x = ball.x - app.view.width / 2
             attemptsText.x =  (ball.x - app.view.width / 2) + 850
+            lastScore.x = (ball.x - app.view.width / 2) + 380
             const circle = new PIXI.Graphics()
             circle.beginFill(colors[throws]).drawCircle(ball.x+25, ball.y+25, 5).endFill()
             app.stage.addChild(circle)
@@ -143,6 +154,8 @@ function throw_ball(ball)
 document.querySelector("#launch").addEventListener('click', () => {
     throws -= 1
     attemptsText.text = `Attempts: ${throws}`
+    document.querySelector("#launch").disabled = true
+    document.querySelector("#launch").style.backgroundColor = 'gray'
     if(throws >= 0) {
         if(throws === 0){
             document.querySelector("#launch").innerHTML = "Reset"
