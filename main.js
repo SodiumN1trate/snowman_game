@@ -4,6 +4,9 @@ const app = new PIXI.Application({
     height: 600,
     antialias: true
 })
+app.view.style.marginLeft = 'auto'
+app.view.style.marginRight = 'auto'
+
 document.body.appendChild(app.view)
 
 const backgroundTexture = PIXI.Texture.from('background.jpg')
@@ -22,12 +25,20 @@ snowman.x = -400
 
 app.stage.addChild(snowman)
 
-const fps = new PIXI.Text('Nope')
+const fps = new PIXI.Text('')
 app.stage.addChild(fps)
+
+const speedText = new PIXI.Text('')
+app.stage.addChild(speedText)
+
+let throws = 3
+
+const attemptsText = new PIXI.Text(`Attempts: ${throws}`)
+attemptsText.x = app.view.width - 1000
+app.stage.addChild(attemptsText)
 
 const ballTexture = PIXI.Texture.from('basketball.svg')
 const ball = new PIXI.Sprite(ballTexture)
-console.log(ball)
 let ballStartCoordinateY = 400
 let ballStartCoordinateX = -350
 ball.y = ballStartCoordinateY
@@ -37,25 +48,39 @@ ball.height = 50
 
 app.stage.addChild(ball)
 
-
-let ballSpeedY = 0
-let ballSpeedX = 0
-
 let lastTime = 0
 
-let isGrounded = false
 
-let throwed = 0
+const colors = [0xFFFFFF, 0x58D68DF, 0x2980B9F]
+
+const leaderboard = [0, 0, 0]
 
 app.stage.pivot.x = -350 - app.view.width / 2
 background.x = -350 - app.view.width / 2
 
-function throw_ball(ball) {
+function throw_ball(ball) 
+{
+    let isGrounded = false
+    ball.y = ballStartCoordinateY
+    ball.x = ballStartCoordinateX
+
+    let forceX = 0
+    let forceY = 0
+
+    app.stage.pivot.x = ball.x - app.view.width / 2
+    background.x = ball.x - app.view.width / 2
+
+    let ballSpeedY = 0
+    let ballSpeedX = 0
+
+    app.stage.pivot.x = ball.x - app.view.width / 2
+    background.x = ball.x - app.view.width / 2
+
     let angle = document.getElementById("angle").value * Math.PI / 180
     let force = document.getElementById("force").value
-        
-    let forceX = Math.cos(angle) * force
-    let forceY = Math.sin(angle) * force
+
+    forceX = Math.cos(angle) * force
+    forceY = Math.sin(angle) * force
 
     let stopAcceleration = forceX / 0.5
 
@@ -78,22 +103,15 @@ function throw_ball(ball) {
                 ballSpeedY = 0
                 if(ballSpeedX > 0) {
                     ballSpeedX -= stopAcceleration / app.ticker.FPS
-                } else {
-                    ballSpeedX = 0
-                    app.stage.pivot.x = ball.x - app.view.width / 2
-                    background.x = ball.x - app.view.width / 2
                     isGrounded = true
-                    ball.y = ballStartCoordinateY
-                    ball.x = ballStartCoordinateX
-                    ballSpeedY = 0
-                    ballSpeedX = 0
-                    forceX = 0
-                    forceY = 0
-                    force = 0
-                    angle = 0
-                    lastTime = 0
-                    app.stage.pivot.x = ball.x - app.view.width / 2
-                    background.x = ball.x - app.view.width / 2
+                    leaderboard[throws] = Math.ceil(ball.x)
+                    if(throws === 0) {
+                        const winnerText = new PIXI.Text(`Highscore: ${String(Math.max.apply(null, leaderboard)/100)} meters`)
+                        app.stage.addChild(winnerText)
+                        winnerText.y =  app.view.height / 2
+                        winnerText.x = 375 + ball.x - app.view.width / 2
+                        delete ball
+                    }
                 }
             }
             else {
@@ -107,23 +125,31 @@ function throw_ball(ball) {
             ball.x += ballSpeedX
             app.stage.pivot.x = ball.x - app.view.width / 2
             background.x = ball.x - app.view.width / 2
-            // background.tilePosition.x -= Math.sqrt(ballSpeedX*ballSpeedX + ballSpeedY*ballSpeedY)
             fps.x = ball.x - app.view.width / 2
+            attemptsText.x =  (ball.x - app.view.width / 2) + 850
             const circle = new PIXI.Graphics()
-            circle.beginFill(0xFFFFFF).drawCircle(ball.x+25, ball.y+25, 5).endFill()
+            circle.beginFill(colors[throws]).drawCircle(ball.x+25, ball.y+25, 5).endFill()
             app.stage.addChild(circle)
-            lastTime += delta
-            console.log(ballSpeedX)
+
+            speedText.text = `${Math.ceil(ball.x/100)}m`
+            speedText.x = ball.x + 50
+            speedText.y = ball.y - 50
         }
     })
 }
 
 
 
-document.querySelector("#launch").addEventListener('click', () => {        
-    isGrounded = false
-    throw_ball(ball)
-
-    delete ball
-
+document.querySelector("#launch").addEventListener('click', () => {
+    throws -= 1
+    attemptsText.text = `Attempts: ${throws}`
+    if(throws >= 0) {
+        if(throws === 0){
+            document.querySelector("#launch").innerHTML = "Reset"
+        }
+        throw_ball(ball)
+    }
+    if(throws < 0){
+        window.location.reload();
+    }
 })
